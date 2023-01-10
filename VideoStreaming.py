@@ -30,22 +30,9 @@ class VideoStreaming(object):
         # self.VIDEO = cv2.VideoCapture(
         #     'rtsp://admin:Abc.12345@'+CAMERA_IP+'/ch0/stream0')
         print(CAMERA_SOURCE)
-        self.VIDEO = cv2.VideoCapture(CAMERA_SOURCE)
-
-
-        # self.VIDEO = cv2.VideoCapture(0)
-
-        # self.MODEL = ObjectDetection()
-
-        # self._preview = True
-        # self._flipH = False
-        # self._detect = False
-        # self._exposure = self.VIDEO.get(cv2.CAP_PROP_EXPOSURE)
-        # self._contrast = self.VIDEO.get(cv2.CAP_PROP_CONTRAST)
-        # self.FRAME = None
-        # thread = Thread(target = self.threaded_function, args=(1,))
-        # thread.start()
-        # thread.join()
+        if CAMERA_SOURCE == '0':
+            CAMERA_SOURCE = int(CAMERA_SOURCE)
+        # self.VIDEO = cv2.VideoCapture(CAMERA_SOURCE)
 
         self.frame_count = 0
         self.previous_frame = None
@@ -69,7 +56,8 @@ class VideoStreaming(object):
 
         self.is_scan_drone = False
 
-        self.ws = websocket.create_connection("ws://127.0.0.1:5001/VideoWebSocket")
+        self.ws = None
+        # self.ws = websocket.create_connection("ws://127.0.0.1:5001/VideoWebSocket")
         # self.ws.send(
         #     json.dumps(
         #         {
@@ -90,6 +78,9 @@ class VideoStreaming(object):
     def websocket_thread(self):
         while True:
             try:
+                if self.ws == None:
+                    self.ws = websocket.create_connection("ws://127.0.0.1:5001/VideoWebSocket")
+
                 data = json.loads(self.ws.recv())
                 print(data)
                 if data['Type'] == "command" and data['Info'] == "start_scan":
@@ -100,7 +91,11 @@ class VideoStreaming(object):
                 print(self.is_scan_drone)
 
             except:
+                self.ws = None
                 pass
+            
+            time.sleep(0.01)
+
 
     def on_message(self, ws, message):
         print(message)
@@ -118,14 +113,38 @@ class VideoStreaming(object):
 
 
     def detect_motion(self, args):
-        global outputFrame, lock
-        # return
+        # global outputFrame, lock
+        cam = cv2.VideoCapture(0)
         while True:
+            if cam.isOpened() == False:
+                continue
+
+            ret, self.snap = cam.read()
+            if ret == False:
+                continue
+            
+            if self.snap is None:
+                continue
+            
+            cv2.imshow('HD Webcam', self.snap)
+            continue
+
+        while True:
+            time.sleep(0.01)
             # wait until the lock is acquired
             # with lock:
+            if self.VIDEO.isOpened() == False:
+                continue
+
             ret, snap = self.VIDEO.read()
             if ret == False:
                 continue
+            
+            if snap is None:
+                continue
+            
+            cv2.imshow('HD Webcam', snap)
+            continue
 
             img_brg = snap.copy()
             if self.is_scan_drone == False:
@@ -231,50 +250,8 @@ class VideoStreaming(object):
 
             time.sleep(0.01)
 
-    @property
-    def preview(self):
-        return self._preview
-
-    @preview.setter
-    def preview(self, value):
-        self._preview = bool(value)
-
-    @property
-    def flipH(self):
-        return self._flipH
-
-    @flipH.setter
-    def flipH(self, value):
-        self._flipH = bool(value)
-
-    @property
-    def detect(self):
-        return self._detect
-
-    @detect.setter
-    def detect(self, value):
-        self._detect = bool(value)
-
-    @property
-    def exposure(self):
-        return self._exposure
-
-    @exposure.setter
-    def exposure(self, value):
-        self._exposure = value
-        self.VIDEO.set(cv2.CAP_PROP_EXPOSURE, self._exposure)
-
-    @property
-    def contrast(self):
-        return self._contrast
-
-    @contrast.setter
-    def contrast(self, value):
-        self._contrast = value
-        self.VIDEO.set(cv2.CAP_PROP_CONTRAST, self._contrast)
-
     def show(self):
-        # return
+        return
         # grab global references to the output frame and lock variables
         global outputFrame, lock
         # loop over frames from the output stream
