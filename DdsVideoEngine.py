@@ -13,6 +13,7 @@ class DdsVideoEngine:
         super(DdsVideoEngine, self).__init__()
 
         camera_source = "rtsp://admin:Abc.12345@192.168.0.65/ch0/stream0"
+        # camera_source = 0
         self.VIDEO = VideoStreaming(callback=self.drone_message, video_source=camera_source)
 
         self.is_scan_drone = False
