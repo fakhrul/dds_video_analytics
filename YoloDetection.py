@@ -73,7 +73,7 @@ class YoloDetection:
             row = cord[i]
             if row[4] >= 0.3:
                 x1, y1, x2, y2 = int(row[0]*x_shape), int(row[1]*y_shape), int(row[2]*x_shape), int(row[3]*y_shape)
-                bgr = (0, 255, 0)
+                bgr = (0,0,255)
                 cv2.rectangle(frame, (x1, y1), (x2, y2), bgr, 2)
                 cv2.putText(frame, self.class_to_label(labels[i]), (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 0.9, bgr, 2)
 
@@ -103,7 +103,7 @@ class YoloDetection:
             fps = 1/np.round(end_time - start_time, 2)
             #print(f"Frames Per Second : {fps}")
              
-            cv2.putText(frame, f'FPS: {int(fps)}', (20,70), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0,255,0), 2)
+            cv2.putText(frame, f'FPS: {int(fps)}', (20,70), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0,0,255), 2)
             
             cv2.imshow('YOLOv5 Detection', frame)
  
@@ -115,14 +115,18 @@ class YoloDetection:
     def process_image(self, frame):
         start_time = time()
         results = self.score_frame(frame)
+        labels, cord = results
+        n = len(labels)
+        # print('results',n)
+
         frame = self.plot_boxes(results, frame)
         
         end_time = time()
         fps = 1/np.round(end_time - start_time, 2)
         #print(f"Frames Per Second : {fps}")
             
-        cv2.putText(frame, f'FPS: {int(fps)}', (20,70), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0,255,0), 2)
-        return frame
+        cv2.putText(frame, f'{n}', (20,70), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0,0,255), 2)
+        return frame, n
 
         
 
@@ -142,7 +146,7 @@ if __name__ == "__main__":
         success, frame = camera.read()
         if not success:
             break
-        frame = yolo.process_image(frame)
+        frame, number = yolo.process_image(frame)
 
         cv2.imshow('HD Webcam', frame)
         

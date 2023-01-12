@@ -4,11 +4,11 @@ import numpy as np
 import cv2
 from flask import Flask,render_template,  Response
 
-from VideoStreaming import *
+from DdsVideoEngine import *
 
 app = Flask(__name__)
 
-VIDEO = VideoStreaming()
+dds = DdsVideoEngine()
 
 @app.route('/')
 def home():
@@ -18,7 +18,7 @@ def home():
 
 @app.route('/video_feed')
 def video_feed():
-    return Response(VIDEO.show(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(dds.show(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == '__main__':
     app.run(debug=True,host='0.0.0.0')
