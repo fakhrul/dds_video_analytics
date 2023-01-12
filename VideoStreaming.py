@@ -40,6 +40,7 @@ class VideoStreaming(object):
 
 
     def detect_motion(self):
+        print('detect motion')
         while True:
             if self.VIDEO.isOpened() == False:
                 continue
@@ -75,12 +76,14 @@ class VideoStreaming(object):
                 [0, 500, 500, 900]
             ]            
             is_detect_motion, displayImage, detectedImage, cropImage, largestBoundingBox= self.motion.process_image(frame.copy(),excluded_area)
-            if is_detect_motion:
+            if is_detect_motion == True:
                 currentDate = datetime.datetime.now()
                 delta = currentDate - self.previous_alarm_date
                 if delta.total_seconds() > 5:
-                    droneImage, droneNumber = self.yolo.process_image(cropImage.copy())
-                    self.callback(detectedImage, cropImage, largestBoundingBox, droneNumber, droneImage)
+                    # droneImage, droneNumber = self.yolo.process_image(cropImage.copy())
+                    # self.callback(detectedImage, cropImage, largestBoundingBox, droneNumber, droneImage)
+                    print('callback')
+                    self.callback(detectedImage, cropImage, largestBoundingBox, 0, droneImage)
                     self.previous_alarm_date = currentDate
 
             self.outputFrame = displayImage
@@ -89,21 +92,24 @@ class VideoStreaming(object):
 
 
 
-def message(is_detect_motion, largestImage, largestCropImage, largestBoundingBox, droneNumber, droneImage):
+def message(largestImage, largestCropImage, largestBoundingBox, droneNumber, droneImage):
     print("CallBack", droneNumber)
 
-if __name__ == "__main__":
-    callback = message
-    videoStream = VideoStreaming(callback)
-    while True:
-        try:
-            cv2.imshow('HD Webcam', videoStream.outputFrame)
-            cv2.imshow('Motion', videoStream.outputObjectFrame)
-            cv2.imshow('Drone', videoStream.droneImage)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-        except:
-            pass
+# if __name__ == "__main__":
+#     callback = message
+#     # video_source ="rtsp://admin:Abc.12345@192.168.0.65/ch0/stream0"
+#     video_source =0
+
+#     videoStream = VideoStreaming(callback, video_source)
+#     while True:
+#         try:
+#             cv2.imshow('HD Webcam', videoStream.outputFrame)
+#             # cv2.imshow('Motion', videoStream.outputObjectFrame)
+#             # cv2.imshow('Drone', videoStream.droneImage)
+#             if cv2.waitKey(1) & 0xFF == ord('q'):
+#                 break
+#         except:
+#             pass
 
 
 

@@ -28,7 +28,6 @@ class MotionDetection:
 
     def process_image(self,  currentFrame, excludedAreas):
         # TODO: add exlcude area
-
         for area in excludedAreas:
             start_point = (area[0], area[1])
             end_point = (area[2], area[3])
@@ -110,13 +109,15 @@ class MotionDetection:
             # cv2.imwrite(filename, largestImage)
             # self.previous_detected_date = currentDate
 
+
         snap = img_brg.copy()
         label = 'Scanning Intrusion'
         H, W = snap.shape[0], snap.shape[1]
         font = cv2.FONT_HERSHEY_COMPLEX
         color = (255, 255, 255)
         cv2.putText(snap, label, (W//2, H//2), font, 1, color, 2)
-
+        
+        
         return is_detect_motion, snap, largestImage, largestCropImage, largestBoundingBox
 
     def detect_motion(self, args):
@@ -260,15 +261,22 @@ class MotionDetection:
 
 if __name__ == "__main__":
     motion = MotionDetection()
-    
-    camera = cv2.VideoCapture(0)
+    video_source ="rtsp://admin:Abc.12345@192.168.0.65/ch0/stream0"
+    # video_source =0
+    camera = cv2.VideoCapture(video_source)
     while True:
         success, frame = camera.read()
         if not success:
             break
-        result, outputFrame = motion.process_image(frame.copy())
-        print(result)
-        cv2.imshow('HD Webcam', outputFrame)
+        excluded_area = [
+                [0, 0,500, 125],
+                [0, 500, 500, 900]
+            ]            
+        is_detect_motion, displayImage, detectedImage, cropImage, largestBoundingBox = motion.process_image(frame.copy(),excluded_area)
+        print(is_detect_motion)
+        
+        if displayImage is not None:
+            cv2.imshow('HD Webcam', displayImage)
         
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break

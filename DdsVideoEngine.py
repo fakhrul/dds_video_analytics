@@ -22,7 +22,6 @@ class DdsVideoEngine:
         t2.start() 
 
     def drone_message(self, detectedImage, cropImage, largestBoundingBox, droneNumber, droneImage):
-        print('drone_message')
 
         # (flag, encodedImage) = cv2.imencode(".jpg", detectedImage)
         currentDate = datetime.datetime.now()
@@ -40,6 +39,7 @@ class DdsVideoEngine:
         if droneNumber > 0:
             incidentType = 2
 
+        print(currentDate.strftime("%Y%m%d%H%M%S.%f"),'incident_message',incidentType)
 
         sendObj = {
             "from": 0,

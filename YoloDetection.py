@@ -113,6 +113,7 @@ class YoloDetection:
         cap.release()
     
     def process_image(self, frame):
+        frame = cv2.resize(frame.copy(), (512,512))
         start_time = time()
         results = self.score_frame(frame)
         labels, cord = results
@@ -139,8 +140,10 @@ import cv2
 
 if __name__ == "__main__":
     yolo = YoloDetection(capture_index=0, model_name='drone.pt')
-    
-    camera = cv2.VideoCapture(0)
+
+    video_source ="rtsp://admin:Abc.12345@192.168.0.65/ch0/stream0"
+    # video_source =0
+    camera = cv2.VideoCapture(video_source)
 
     while True:
         success, frame = camera.read()
